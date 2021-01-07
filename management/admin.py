@@ -7,6 +7,9 @@ from .models import Products
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('main_class', 'name', 'model', 'price')
+    list_filter = ('main_class', 'brand', 'supplier')
+    search_fields = ('main_class', 'name', 'model', 'sub_class', 'brand', 'supplier', 'inner_model', 'level')
+    ordering = ('main_class', 'sub_class', 'brand', 'name')
     fieldsets = (['必填', {'fields': ('main_class', ('name', 'model'), ('price', 'cost')), }],
                  ['选填', {'fields': ('sub_class', 'brand', 'supplier', 'inner_model', 'unit', 'picture',
                                     'product_page', 'introduce', 'link', 'level', 'inventory', 'note'),
