@@ -54,9 +54,35 @@ class ProductAdmin(admin.ModelAdmin):
                  ['选填', {'fields': ('sub_class', 'brand', 'supplier', 'inner_model', 'unit', 'picture',
                                     'product_page', 'introduce', 'link', 'level', 'inventory', 'note'),
                          'classes': ('collapse',)}])
+    # readonly_fields = ('name', 'model', 'cost',)
+    # list_editable = ('price',)
 #     def save_model(self, request, obj, form, change):
 #         obj.creator = request.user
 #         super().save_model(request, obj, form, change)
+
+    def get_list_editable(self, request):
+        group_names = self.get_group_names(request.user)
+        if request.user.is_superuser or 'group1' in group_names:
+            return ['price']
+        return ()
+
+    def get_changelist_instance(self, request):
+        self.list_editable = self.get_list_editable(request)
+        return super(ProductAdmin, self).get_changelist_instance(request)
+
+    def get_group_names(self, user):
+        group_names = []
+        for g in user.groups.all():
+            group_names.append(g.name)
+        logger.info('group_names:{}'.format(group_names))
+        return group_names
+
+    def get_readonly_fields(self, request, obj=None):
+        groups = self.get_group_names(request.user)
+        if 'group1' in groups:
+            logger.info("user:{} in group1".format(request.user.username))
+            return ['name', 'model', 'cost']
+        return ()
 
 
 admin.site.register(Products, ProductAdmin)
