@@ -36,6 +36,10 @@ class Products(models.Model):
         verbose_name = u'产品'
         verbose_name_plural = u'产品'
 
+        permissions = [
+            ('export', 'Can export product information')
+        ]
+
     def __str__(self):
         return self.main_class
 

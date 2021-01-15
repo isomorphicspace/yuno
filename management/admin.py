@@ -41,7 +41,7 @@ def export_products_to_csv(modeladmin, request, queryset):
 
 
 export_products_to_csv.short_description = u'导出为csv文件'
-# export_products_to_csv.allowed_permissions = ('export',)
+export_products_to_csv.allowed_permissions = ('export',)
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -54,11 +54,24 @@ class ProductAdmin(admin.ModelAdmin):
                  ['选填', {'fields': ('sub_class', 'brand', 'supplier', 'inner_model', 'unit', 'picture',
                                     'product_page', 'introduce', 'link', 'level', 'inventory', 'note'),
                          'classes': ('collapse',)}])
+
+    # 可以设置根据不同用户详情返回不同的字段，比如这里可以设计成，采购可以先登录设置好产品名称、型号和成本等敏感信息，
+    # 然后由其他不能接触到成本的用户来录入其他的信息
+    # def get_fieldsets(self, request, obj=None):
+
+    # 限制数据集，没有设置此方法，则返回全部数据集
+    # def get_queryset(self, request):
+
     # readonly_fields = ('name', 'model', 'cost',)
     # list_editable = ('price',)
-#     def save_model(self, request, obj, form, change):
-#         obj.creator = request.user
-#         super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.creator = request.user
+    #     super().save_model(request, obj, form, change)
+
+    # 当前用户是否有导出权限：
+    def has_export_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, "export"))
 
     def get_list_editable(self, request):
         group_names = self.get_group_names(request.user)
